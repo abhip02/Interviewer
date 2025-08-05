@@ -10,10 +10,17 @@ function injectScriptFile(fileName) {
 // Inject the script into the page context
 injectScriptFile('page-inject.js');
 
-// Listen for messages from page-injected script
 window.addEventListener('message', event => {
   if (event.source !== window) return;
   if (event.data?.type === 'FROM_PAGE') {
-    console.log('[Interboo 👻] CodeMirror editor content:', event.data.editors);
+    const editors = event.data.editors;
+    console.log('[Interboo 👻] CodeMirror editor content:', editors);
+
+    // Send code to local Python server
+    fetch('http://localhost:8765', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ editors })
+    }).catch(err => console.warn("Failed to send to local server:", err));
   }
 });
