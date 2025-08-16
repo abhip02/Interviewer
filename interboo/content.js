@@ -27,7 +27,7 @@ window.addEventListener('message', event => {
 
 // Example: send a test message once the page loads
 chrome.runtime.sendMessage(
-  { type: "SAVE_MESSAGE", data: "Hello from content.js" },
+  { type: "SAVE_MESSAGE", data: "Abhi says hi" },
   (response) => {
     console.log("Response from background:", response);
   }
