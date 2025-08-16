@@ -24,3 +24,11 @@ window.addEventListener('message', event => {
     }).catch(err => console.warn("Failed to send to local server:", err));
   }
 });
+
+// Example: send a test message once the page loads
+chrome.runtime.sendMessage(
+  { type: "SAVE_MESSAGE", data: "Hello from content.js" },
+  (response) => {
+    console.log("Response from background:", response);
+  }
+);
