@@ -1,22 +1,22 @@
-// chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-//   console.log("Background received:", message);
-
-//   if (message.type === "SAVE_MESSAGE") {
-//     // In the future, you could persist this or forward it to popup.js
-//     // For now, just echo back
-//     sendResponse({ status: "Message stored", echo: message.data });
-//   }
-
-//   return true; // keeps the channel open for async responses
-// });
-
 let storedMessages = [];
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("Background received:", message);
+  console.log("[Interboo 👻 background] received:", message);
 
   if (message.type === "SAVE_MESSAGE") {
+    // Store the message (optional)
     storedMessages.push(message.data);
+
+    // Forward message to active tab to display
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]?.id) {
+        chrome.tabs.sendMessage(tabs[0].id, {
+          type: "DISPLAY_MESSAGE",
+          data: message.data
+        });
+      }
+    });
+
     sendResponse({ status: "Message stored" });
   }
 
@@ -24,5 +24,5 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse(storedMessages);
   }
 
-  return true;
+  return true; // Keep channel open for async responses
 });
