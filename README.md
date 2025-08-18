@@ -1,2 +1,1 @@
-Steps:
-1. Chrome browser extension
+Test: https://codemirror.net/5/demo/theme.html
