@@ -1,28 +1,18 @@
-let storedMessages = [];
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  console.log("[Interboo 👻 background] received:", message);
-
-  if (message.type === "SAVE_MESSAGE") {
-    // Store the message (optional)
-    storedMessages.push(message.data);
-
-    // Forward message to active tab to display
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs[0]?.id) {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          type: "DISPLAY_MESSAGE",
-          data: message.data
+  if (message.type === "SEND_CODE") {
+    fetch("http://localhost:8765", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ editors: message.code })
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // send the analysis result back to content.js
+        chrome.tabs.sendMessage(sender.tab.id, {
+          type: "PYTHON_RESULT",
+          result: data.analysis
         });
-      }
-    });
-
-    sendResponse({ status: "Message stored" });
+      })
+      .catch((err) => console.error("Error talking to Python:", err));
   }
-
-  if (message.type === "GET_MESSAGES") {
-    sendResponse(storedMessages);
-  }
-
-  return true; // Keep channel open for async responses
 });
